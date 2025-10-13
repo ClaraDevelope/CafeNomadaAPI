@@ -4,22 +4,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.ipartek.cafeNomada.apirest.models.entities.Product;
+import com.ipartek.cafeNomada.apirest.models.entities.Category;
 import com.ipartek.cafeNomada.apirest.models.services.ProductService;
+import com.ipartek.cafeNomada.apirest.models.services.CategoryService;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
-@CrossOrigin(origins = "http://localhost:4200") // permite peticiones desde tu Angular en local
+@CrossOrigin(origins = "http://localhost:4200") // permite peticiones desde Angular en local
 @RestController
 @RequestMapping("/api/products") // prefijo común para todos los endpoints
-
 public class ProductController {
 
     private final ProductService productService;
+    private final CategoryService categoryService;
 
     // inyección por constructor (Spring crea e inyecta el servicio)
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, CategoryService categoryService) {
         this.productService = productService;
+        this.categoryService = categoryService;
     }
 
     // GET /api/products  -> lista todos
@@ -39,6 +43,13 @@ public class ProductController {
     // POST /api/products  -> crear
     @PostMapping("/new")
     public ResponseEntity<Product> create(@RequestBody Product product) {
+
+        // Si el producto viene solo con categoryId, buscamos la categoría
+        if (product.getCategory() != null && product.getCategory().getId() != null) {
+            Optional<Category> categoryOpt = categoryService.getById(product.getCategory().getId());
+            categoryOpt.ifPresent(product::setCategory);
+        }
+
         Product saved = productService.saveProduct(product);
         return ResponseEntity
                 .created(URI.create("/api/products/" + saved.getId()))
@@ -50,7 +61,14 @@ public class ProductController {
     public ResponseEntity<Product> update(@PathVariable Long id, @RequestBody Product product) {
         return productService.getProductById(id)
                 .map(existing -> {
-                    product.setId(id);                // aseguramos el id
+                    product.setId(id); // aseguramos el id
+
+                    // Si viene categoryId, actualizamos la categoría asociada
+                    if (product.getCategory() != null && product.getCategory().getId() != null) {
+                        Optional<Category> categoryOpt = categoryService.getById(product.getCategory().getId());
+                        categoryOpt.ifPresent(product::setCategory);
+                    }
+
                     Product updated = productService.saveProduct(product);
                     return ResponseEntity.ok(updated);
                 })
@@ -67,5 +85,4 @@ public class ProductController {
             return ResponseEntity.notFound().build();
         }
     }
-
 }
