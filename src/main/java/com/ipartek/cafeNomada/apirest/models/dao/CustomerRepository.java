@@ -10,9 +10,6 @@ import com.ipartek.cafeNomada.apirest.models.entities.Customer;
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
-    // Buscar cliente por email (útil para login o registro)
+   boolean existsByEmail(String email);
     Optional<Customer> findByEmail(String email);
-
-    // Comprobar si ya existe un cliente con un email
-    boolean existsByEmail(String email);
 }
