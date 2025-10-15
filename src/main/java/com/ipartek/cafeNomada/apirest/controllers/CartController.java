@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/carts")
-@CrossOrigin(origins = "*") // para permitir llamadas desde el front
+@CrossOrigin(origins = "http://localhost:4200")
 public class CartController {
 
     private final CartService cartService;

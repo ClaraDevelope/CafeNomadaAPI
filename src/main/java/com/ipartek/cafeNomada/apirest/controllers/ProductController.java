@@ -27,7 +27,7 @@ public class ProductController {
     }
 
     // GET /api/products  -> lista todos
-    @GetMapping("/")
+    @GetMapping({ "", "/" })
     public List<Product> getAll() {
         return productService.getAllProducts();
     }
