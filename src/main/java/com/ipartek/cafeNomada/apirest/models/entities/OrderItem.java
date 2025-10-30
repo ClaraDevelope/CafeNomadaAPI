@@ -2,6 +2,8 @@ package com.ipartek.cafeNomada.apirest.models.entities;
 
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 
 /**
@@ -17,6 +19,7 @@ public class OrderItem {
     private Long id;
 
     // Cada línea pertenece a un pedido concreto
+    @JsonIgnore 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
